@@ -1,3 +1,4 @@
+using NuGet.Frameworks;
 using System;
 using Xunit;
 
@@ -30,14 +31,30 @@ namespace LoggingKata.Test
             //       each representing a TacoBell location
 
             //Arrange
+            var tacoParser = new TacoParser();
 
             //Act
+            var actual = tacoParser.Parse(line);
 
             //Assert
+            Assert.Equal(actual.Location.Longitude, expected);
         }
 
 
         //TODO: Create a test ShouldParseLatitude
+        [Theory]
+        [InlineData("33.435038, -86.081123, Taco Bell Talladeg...", 33.435038)]
+        public void ShouldParseLatitude(string line, double expected)
+        {
+            //Arrange
+            var tacoParser = new TacoParser();
+
+            //Act
+            var actual = tacoParser.Parse(line);
+
+            //Assert
+            Assert.Equal(actual.Location.Latitude, expected);
+        }
 
     }
 }
