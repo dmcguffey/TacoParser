@@ -20,6 +20,14 @@ namespace LoggingKata
             // use File.ReadAllLines(path) to grab all the lines from your csv file
             // Log and error if you get 0 lines and a warning if you get 1 line
             var lines = File.ReadAllLines(csvPath);
+            if (lines.Length == 0)
+            {
+                logger.LogError("Read Error.");
+            }
+            else if (lines.Length == 1)
+            {
+                logger.LogWarning("**Warning** only one line detected.");
+            }
 
             logger.LogInfo($"Lines: {lines[0]}");
 
@@ -28,6 +36,7 @@ namespace LoggingKata
 
             // Grab an IEnumerable of locations using the Select command: var locations = lines.Select(parser.Parse);
             var locations = lines.Select(parser.Parse).ToArray();
+            Console.WriteLine(locations);
 
             // DON'T FORGET TO LOG YOUR STEPS
 
@@ -45,17 +54,36 @@ namespace LoggingKata
 
             //HINT NESTED LOOPS SECTION---------------------
             // Do a loop for your locations to grab each location as the origin (perhaps: `locA`)
+            for (int i = 0; i < locations.Length; i++)
+            {
+                var locA = locations[i];
+                // Create a new corA Coordinate with your locA's lat and long
+                var CorA = new GeoCoordinate();
+                CorA.Latitude = locA.Location.Latitude;
+                CorA.Longitude = locA.Location.Longitude;
 
-            // Create a new corA Coordinate with your locA's lat and long
+                // Now, do another loop on the locations with the scope of your first loop, so you can grab the "destination" location (perhaps: `locB`)
+                for (int x = 0; x < locations.Length; x++)
+                {
+                    var locB = locations[x];
+                    // Create a new Coordinate with your locB's lat and long
+                    var CorB = new GeoCoordinate();
+                    CorB.Latitude= locB.Location.Latitude;
+                    CorB.Longitude= locB.Location.Longitude;
 
-            // Now, do another loop on the locations with the scope of your first loop, so you can grab the "destination" location (perhaps: `locB`)
+                    // Now, compare the two using `.GetDistanceTo()`, which returns a double
+                    // If the distance is greater than the currently saved distance, update the distance and the two `ITrackable` variables you set above
+                    if (CorA.GetDistanceTo(CorB) > distance)
+                    {
+                        distance = CorA.GetDistanceTo(CorB);
+                        TacoOne = locA;
+                        TacoTwo = locB;
+                    }
 
-            // Create a new Coordinate with your locB's lat and long
-
-            // Now, compare the two using `.GetDistanceTo()`, which returns a double
-            // If the distance is greater than the currently saved distance, update the distance and the two `ITrackable` variables you set above
-
+                }
+            }
             // Once you've looped through everything, you've found the two Taco Bells farthest away from each other.
+            logger.LogInfo($"Distance is furthest between {TacoOne.Name} and {TacoTwo.Name}.");
 
 
             
